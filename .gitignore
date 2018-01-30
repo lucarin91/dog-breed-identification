@@ -1,3 +1,12 @@
+# inputs data
+input/test/
+input/train/
+input/labels.csv
+input/sample_submission.csv
+
+# Jupyter
+.ipynb_checkpoints
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

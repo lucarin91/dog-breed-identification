@@ -1,0 +1,12 @@
+isort
+jupyterlab
+Keras
+numpy
+pandas
+seaborn
+tensorflow
+tensorflow-gpu
+tensorflow-tensorboard
+matplotlib
+opencv-python
+tqdm
