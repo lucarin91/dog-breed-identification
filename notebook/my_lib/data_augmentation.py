@@ -12,6 +12,10 @@ class DataAugmentation(object):
         self.length = len(images)
         
         self.horizontal_flips = options.get('horizontal_flips', True)
+        self.rotation = options.get('rotation', True)
+        self.rotation_config = options.get('rotation_config', [
+            (10,1.2), (20,1.3)
+        ])
         self.inverse = options.get('inverse', True)
         self.sobel_derivative = options.get('sobel_derivative', True)
         self.scharr_derivative = options.get('scharr_derivative', True)
@@ -133,8 +137,31 @@ class DataAugmentation(object):
                 for i in range(1, self.bilateral_blur_config['kernel_size'], self.bilateral_blur_config['step_size']):
                     augmented_image_set.append(cv2.bilateralFilter(image, i, i*2, i/2))
 
+
+            # if not augmented_image_set:
+            # augmented_image_set.append(image)
+
+            if self.rotation:
+                # for image in augmented_image_set:
+                #     rows, cols, *_ = image.shape
+                #     for angle, scale in [(-20,1.3), (-10,1.2), (10,1.2), (20,1.3)]:
+                #         M = cv2.getRotationMatrix2D((cols/2, rows/2), angle, scale)
+                #         dst = cv2.warpAffine(image, M, (cols, rows))
+                #         augmented_image_set.append(dst)
+                
+                rotations = self.rotation_config
+                def rotate_image(image, angle, scale):
+                    rows, cols, *_ = image.shape                    
+                    M = cv2.getRotationMatrix2D((cols/2, rows/2), angle, scale)
+                    dst = cv2.warpAffine(image, M, (cols, rows))
+                    return dst
+                augmented_image_set += [rotate_image(image, angle, scale) 
+                                        for image in augmented_image_set + [image]
+                                        for angle, scale in rotations]
+           
             if self.horizontal_flips:
-                augmented_image_set += [cv2.flip(np.array(image), 1) for image in augmented_image_set]
+                augmented_image_set += [cv2.flip(np.array(image), 1) for image in augmented_image_set + [image]]
+                # augmented_image_set.append(cv2.flip(np.array(image), 1))
 
             if self.shuffle_result:
                 np.random.shuffle(augmented_image_set)
