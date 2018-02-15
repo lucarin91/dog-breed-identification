@@ -3,6 +3,8 @@ input/test/
 input/train/
 input/labels.csv
 input/sample_submission.csv
+output/*.csv
+output/*.hdf5
 
 # vscode
 .vscode/
