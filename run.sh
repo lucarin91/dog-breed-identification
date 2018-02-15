@@ -1,2 +1,2 @@
 #!/bin/sh
-jupyter-lab notebook/main.ipynb
+jupyter-lab notebook

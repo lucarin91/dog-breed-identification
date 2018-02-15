@@ -4,6 +4,9 @@ input/train/
 input/labels.csv
 input/sample_submission.csv
 
+# vscode
+.vscode/
+
 # Jupyter
 .ipynb_checkpoints
 
