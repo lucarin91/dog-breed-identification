@@ -5,6 +5,8 @@ input/labels.csv
 input/sample_submission.csv
 output/*.csv
 output/*.hdf5
+output/*.h5
+output/*.bin
 
 # vscode
 .vscode/

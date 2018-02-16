@@ -37,6 +37,9 @@ from data_augmentation import DataAugmentation
 # import data
 csv_train = pd.read_csv('../input/labels.csv')
 
+# DEBUG: reduce data for test
+csv_train = csv_train.head(1000)
+
 # Generate Labels
 targets_series = pd.Series(csv_train['breed'])
 one_hot = pd.get_dummies(targets_series, sparse = True)
@@ -68,9 +71,9 @@ for i, images in enumerate(tqdm(DataAugmentation(x_train,
                                                           'rotation_config': [(20,1.3)],
                                                           'shuffle_result': False}))):
     for image in images:
-        if i == 4:
-            plt.imshow(image, cmap = 'gray', interpolation = 'bicubic')
-            plt.show()
+        # if i == 4:
+        #     plt.imshow(image, cmap = 'gray', interpolation = 'bicubic')
+        #     plt.show()
         x_train.append(image)
         y_train.append(y_train[i])
 
@@ -166,11 +169,11 @@ for i, param in enumerate(grid):
     if loss < best_loss:
         print('Found a better loss!!')
         best_loss = loss
-        model.save('../output/best_{}.h5'.format(NAME))
+        model.save('../output/best_{}_{:.2f}.h5'.format(NAME, loss))
 
     
     ## salva su file la grind_ris usando pickle 
-    pickle.dump(grind_ris, open('../output/params_{}.bin'.format(NAME), 'wb'))
+    pickle.dump(grind_ris, open('../output/params_{}-{}_{:.2f}.bin'.format(NAME, i, loss), 'wb'))
 
 
 '''
