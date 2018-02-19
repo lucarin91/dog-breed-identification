@@ -1,6 +1,6 @@
 '''
 VGG16 with the combination of the parameters:
-- 'hdd_size': [1000],
+- 'hdd_size': [128, 256, 512],
 - 'dr': [0.1, 0.5],
 - 'lr': [0.01, 0.0001],
 - 'bsz': [32, 64],
@@ -38,7 +38,7 @@ from data_augmentation import DataAugmentation
 csv_train = pd.read_csv('../input/labels.csv')
 
 # DEBUG: reduce data for test
-csv_train = csv_train.head(1000)
+# csv_train = csv_train.head(1000)
 
 # Generate Labels
 targets_series = pd.Series(csv_train['breed'])
@@ -122,10 +122,10 @@ def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu',
                 metrics=['accuracy'])
 
     callbacks_list = [
-        keras.callbacks.ModelCheckpoint('../output/model_' + NAME + '_{epoch:02d}-{val_loss:.2f}.h5',
-                                        monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=False,
-                                        mode='auto', period=1),
-        keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, verbose=1)]
+        # keras.callbacks.ModelCheckpoint('../output/model_' + NAME + '_{epoch:02d}-{val_loss:.2f}.h5',
+        #                                 monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=False,
+        #                                 mode='auto', period=1),
+        keras.callbacks.EarlyStopping(monitor='val_loss', patience=4, verbose=1)]
     model.summary()
     return model, callbacks_list
 
@@ -136,16 +136,16 @@ def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu',
 #                     callbacks=callbacks_list, verbose=1)
 
 
-param_grid = {'hdd_size': [100, 1000],
+param_grid = {'hdd_size': [128, 256, 512],
               'dr': [0.1, 0.5],
               'lr': [0.01, 0.0001],
               'bsz': [32, 64],
-              'deep': [1, 2, 4],
+              'deep': [2, 4],
               'act_fun': ['relu']}
 
 
 grid = list(ParameterGrid(param_grid))
-print(grid) ## ci sono tutte le possibili combinazioni di PARAMETRI
+print(grid)
 grind_ris = []
 best_loss = 10000
 
@@ -165,15 +165,14 @@ for i, param in enumerate(grid):
 
     grind_ris.append({'id': i, 'loss_val': loss, 'acc_val': acc, 'par': param, 'hist': h})
 
-    ## se puoi salva anche il modello migliore
     if loss < best_loss:
         print('Found a better loss!!')
         best_loss = loss
-        model.save('../output/best_{}_{:.2f}.h5'.format(NAME, loss))
+        model.save('../output/bestmodel_{}-{}_{:.2f}.h5'.format(NAME, i, loss))
 
     
     ## salva su file la grind_ris usando pickle 
-    pickle.dump(grind_ris, open('../output/params_{}-{}_{:.2f}.bin'.format(NAME, i, loss), 'wb'))
+    pickle.dump(grind_ris, open('../output/params_{}.bin'.format(NAME), 'wb'))
 
 
 '''
