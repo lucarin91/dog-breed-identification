@@ -18,6 +18,7 @@ NAME = __file__.split('.')[0]
 import pickle
 import random
 import sys
+from pprint import pprint
 
 import cv2
 import keras
@@ -38,7 +39,7 @@ from data_augmentation import DataAugmentation
 csv_train = pd.read_csv('../input/labels.csv')
 
 # DEBUG: reduce data for test
-csv_train = csv_train.head(2500)
+# csv_train = csv_train.head(2500)
 
 # Generate Labels
 targets_series = pd.Series(csv_train['breed'])
@@ -70,11 +71,18 @@ for i, images in enumerate(tqdm(data_aug)):
         x_train.append(image)
         y_train.append(y_train[i])
 
+print('Train set become', len(x_train))
+
 # build np array and normalise them
 X_train = np.array(x_train, np.float32) / 255.
 Y_train = np.array(y_train, np.uint8)
-X_valid = np.array(x_train, np.float32) / 255.
-Y_valid = np.array(y_train, np.uint8)
+X_valid = np.array(x_valid, np.float32) / 255.
+Y_valid = np.array(y_valid, np.uint8)
+print('shape X_train', X_train.shape)
+print('shape Y_train', Y_train.shape)
+print('shape X_valid', X_valid.shape)
+print('shape Y_valid', Y_valid.shape)
+input()
 
 # usesfull variable
 num_classes = Y_train.shape[1]
@@ -109,7 +117,7 @@ def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu',
         # keras.callbacks.ModelCheckpoint('../output/model_' + NAME + '_{epoch:02d}-{val_loss:.2f}.h5',
         #                                 monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=False,
         #                                 mode='auto', period=1),
-        keras.callbacks.EarlyStopping(monitor='val_loss', patience=4, verbose=1)]
+        keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, verbose=1)]
     model.summary()
     return model, callbacks_list
 
@@ -122,10 +130,12 @@ param_grid = {'hdd_size': [512, 1024, 2056],
               'act_fun': ['relu', 'sigmoid']}
 
 grid = list(ParameterGrid(param_grid))
-print(grid)
+pprint(grid)
+print("{} combinations".format(len(grid)))
+input()
+
 grind_ris = []
 best_loss = 10000
-
 for i, param in enumerate(grid):
     model, callbacks_list = model_builder(hdd_size=param['hdd_size'],
                                           dr=param['dr'],
