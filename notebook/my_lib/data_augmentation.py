@@ -11,36 +11,36 @@ class DataAugmentation(object):
         self.images = images[:]
         self.length = len(images)
         
-        self.horizontal_flips = options.get('horizontal_flips', True)
-        self.rotation = options.get('rotation', True)
+        self.horizontal_flips = options.get('horizontal_flips', False)
+        self.rotation = options.get('rotation', False)
         self.rotation_config = options.get('rotation_config', [
             (10,1.2), (20,1.3)
         ])
-        self.inverse = options.get('inverse', True)
-        self.sobel_derivative = options.get('sobel_derivative', True)
-        self.scharr_derivative = options.get('scharr_derivative', True)
-        self.laplacian = options.get('laplacian', True)
-        self.blur = options.get('blur', True)
+        self.inverse = options.get('inverse', False)
+        self.sobel_derivative = options.get('sobel_derivative', False)
+        self.scharr_derivative = options.get('scharr_derivative', False)
+        self.laplacian = options.get('laplacian', False)
+        self.blur = options.get('blur', False)
         self.blur_config = options.get('blur_config', {
             'kernel_size': 15,
             'step_size': 2
         })
-        self.gaussian_blur = options.get('gaussian_blur', True)
+        self.gaussian_blur = options.get('gaussian_blur', False)
         self.gaussian_blur_config = options.get('gaussian_blur_config', {
             'kernel_size': 20,
             'step_size': 2
         })
-        self.median_blur = options.get('median_blur', True)
+        self.median_blur = options.get('median_blur', False)
         self.median_blur_config = options.get('median_blur_config', {
             'kernel_size': 10,
             'step_size': 2
         })
-        self.bilateral_blur = options.get('bilateral_blur', True)
+        self.bilateral_blur = options.get('bilateral_blur', False)
         self.bilateral_blur_config = options.get('bilateral_blur_config', {
             'kernel_size': 30,
             'step_size': 2
         })
-        self.shuffle_result = options.get('shuffle_result', True)
+        self.shuffle_result = options.get('shuffle_result', False)
 
     def __iter__(self):
         for image in self.images:
@@ -161,15 +161,13 @@ class DataAugmentation(object):
            
             if self.horizontal_flips:
                 augmented_image_set += [cv2.flip(np.array(image), 1) for image in augmented_image_set + [image]]
-                # augmented_image_set.append(cv2.flip(np.array(image), 1))
 
             if self.shuffle_result:
                 np.random.shuffle(augmented_image_set)
             
             yield augmented_image_set
 
-#	return [np.array(image) for image in augmented_images_set]
 
     def __len__(self):
-        "This method returns the total number of elements"
+        """This method returns the total number of elements"""
         return self.length

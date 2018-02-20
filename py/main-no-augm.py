@@ -1,18 +1,14 @@
 """
 VGG16 with the combination of the parameters:
-- 'hdd_size': [512, 1024, 2056]
-- 'dr': [0.1, 0.3]
+- 'hdd_size': [512, 1024, 2048]
+- 'dr': [0.1]
 - 'lr': [0.0001]
 - 'bsz': [64]
-- 'deep': [2]
+- 'deep': [2, 4]
 - 'act_fun': ['relu', 'sigmoid']
 
-Augmetation with:
-- rotation 20°, 1.3 scale
-- rotation -20°, 1.3 scale
-- horizontal flip
+No augmentation
 """
-
 NAME = __file__.split('.')[0]
 
 import pickle
@@ -31,14 +27,14 @@ from sklearn.model_selection import ParameterGrid, train_test_split
 from tqdm import tqdm
 
 # import my library
-sys.path.append('../notebook/my_lib/')
-from data_augmentation import DataAugmentation
+# sys.path.append('../notebook/my_lib/')
+# from data_augmentation import DataAugmentation
 
 # import data
 csv_train = pd.read_csv('../input/labels.csv')
 
 # DEBUG: reduce data for test
-csv_train = csv_train.head(2500)
+# csv_train = csv_train.head(1000)
 
 # Generate Labels
 targets_series = pd.Series(csv_train['breed'])
@@ -55,29 +51,33 @@ for i, (f, breed) in enumerate(tqdm(csv_train.values)):
     x_train.append(cv2.resize(img, (im_size, im_size)))
     y_train.append(labels[i])
 
-# Using the stratify parameter on treain_test_split the split should be equally distributed per classes.
-# Try a small percentage of dataset for validation (5%)
-x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train,
-                                                      test_size=0.05, random_state=42,
-                                                      stratify=y_train)
-
 # Data argumentation
-data_aug = DataAugmentation(x_train, options={'horizontal_flips': True,
-                                              'rotation': True,
-                                              'rotation_config': [(20,1.3)]})
-for i, images in enumerate(tqdm(data_aug)):
-    for image in images:
-        x_train.append(image)
-        y_train.append(y_train[i])
+# data_aug = DataAugmentation(x_train, options={'horizontal_flips': True,
+#                                               'rotation': True,
+#                                               'rotation_config': [(20,1.3)]})
+# for i, images in enumerate(tqdm(data_aug)):
+#     for image in images:
+#         # if i == 4:
+#         #     plt.imshow(image, cmap = 'gray', interpolation = 'bicubic')
+#         #     plt.show()
+#         x_train.append(image)
+#         y_train.append(y_train[i])
+
 
 # build np array and normalise them
-X_train = np.array(x_train, np.float32) / 255.
-Y_train = np.array(y_train, np.uint8)
-X_valid = np.array(x_train, np.float32) / 255.
-Y_valid = np.array(y_train, np.uint8)
+x_train_raw = np.array(x_train, np.float32) / 255.
+y_train_raw = np.array(y_train, np.uint8)
+print("x_train shape:", x_train_raw.shape)
+print("y_train shape:", y_train_raw.shape)
 
 # usesfull variable
-num_classes = Y_train.shape[1]
+num_classes = y_train_raw.shape[1]
+
+# Using the stratify parameter on treain_test_split the split should be equally distributed per classes.
+# Try a small percentage of dataset for validation (5%)
+X_train, X_valid, Y_train, Y_valid = train_test_split(x_train_raw, y_train_raw,
+                                                      test_size=0.05, random_state=42,
+                                                      stratify=y_train_raw)
 
 
 def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu', deep=5):
@@ -109,16 +109,16 @@ def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu',
         # keras.callbacks.ModelCheckpoint('../output/model_' + NAME + '_{epoch:02d}-{val_loss:.2f}.h5',
         #                                 monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=False,
         #                                 mode='auto', period=1),
-        keras.callbacks.EarlyStopping(monitor='val_loss', patience=4, verbose=1)]
+        keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, verbose=1)]
     model.summary()
     return model, callbacks_list
 
 
-param_grid = {'hdd_size': [512, 1024, 2056],
-              'dr': [0.1, 0.3],
+param_grid = {'hdd_size': [512, 1024, 2048],
+              'dr': [0.1],
               'lr': [0.0001],
               'bsz': [64],
-              'deep': [2],
+              'deep': [2, 4],
               'act_fun': ['relu', 'sigmoid']}
 
 grid = list(ParameterGrid(param_grid))
