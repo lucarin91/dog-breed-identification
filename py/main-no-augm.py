@@ -4,7 +4,7 @@ VGG19 with the combination of the parameters:
 - 'dr': [0.1, 0.3]
 - 'lr': [0.0001]
 - 'bsz': [64]
-- 'deep': [1, 2, 4]
+- 'deep': [2, 4]
 - 'act_fun': ['relu', 'sigmoid']
 
 No augmentation
@@ -103,11 +103,12 @@ param_grid = {'hdd_size': [512, 1024],
               'dr': [0.1, 0.3],
               'lr': [0.0001],
               'bsz': [64],
-              'deep': [1, 2, 4],
+              'deep': [2, 4],
               'act_fun': ['relu', 'sigmoid']}
 
 grid = list(ParameterGrid(param_grid))
 pprint(grid)
+print('{} numeber of combinations'.format(len(grid)))
 input()
 
 grind_ris = []
