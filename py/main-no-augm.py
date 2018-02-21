@@ -1,11 +1,11 @@
 """
-VGG16 with the combination of the parameters:
-- 'hdd_size': [512, 1024, 2048]
-- 'dr': [0.1]
+VGG19 with the combination of the parameters:
+- 'hdd_size': [512, 1024]
+- 'dr': [0.1, 0.3]
 - 'lr': [0.0001]
 - 'bsz': [64]
-- 'deep': [2, 4]
-- 'act_fun': ['relu', 'sigmoid']
+- 'deep': [1, 2, 4]
+- 'act_fun': ['relu']
 
 No augmentation
 """
@@ -14,13 +14,14 @@ NAME = __file__.split('.')[0]
 import pickle
 import random
 import sys
+from pprint import pprint
 
 import cv2
 import keras
 import numpy as np
 import pandas as pd
 from keras import optimizers
-from keras.applications.vgg16 import VGG16
+from keras.applications.vgg19 import VGG19
 from keras.layers import Dense, Dropout, Flatten
 from keras.models import Model
 from sklearn.model_selection import ParameterGrid, train_test_split
@@ -69,6 +70,7 @@ x_train_raw = np.array(x_train, np.float32) / 255.
 y_train_raw = np.array(y_train, np.uint8)
 print("x_train shape:", x_train_raw.shape)
 print("y_train shape:", y_train_raw.shape)
+input()
 
 # usesfull variable
 num_classes = y_train_raw.shape[1]
@@ -81,7 +83,7 @@ X_train, X_valid, Y_train, Y_valid = train_test_split(x_train_raw, y_train_raw,
 
 
 def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu', deep=5):
-    base_model = VGG16(weights="imagenet", include_top=False, input_shape=(im_size, im_size, 3))
+    base_model = VGG19(weights="imagenet", include_top=False, input_shape=(im_size, im_size, 3))
 
     # Add a new top layers
     x = base_model.output
@@ -114,18 +116,19 @@ def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu',
     return model, callbacks_list
 
 
-param_grid = {'hdd_size': [512, 1024, 2048],
-              'dr': [0.1],
+param_grid = {'hdd_size': [512, 1024],
+              'dr': [0.1, 0.3],
               'lr': [0.0001],
               'bsz': [64],
-              'deep': [2, 4],
-              'act_fun': ['relu', 'sigmoid']}
+              'deep': [1, 2, 4],
+              'act_fun': ['relu']}
 
 grid = list(ParameterGrid(param_grid))
-print(grid)
+pprint(grid)
+input()
+
 grind_ris = []
 best_loss = 10000
-
 for i, param in enumerate(grid):
     model, callbacks_list = model_builder(hdd_size=param['hdd_size'],
                                           dr=param['dr'],
@@ -148,5 +151,5 @@ for i, param in enumerate(grid):
         model.save('../output/bestmodel_{}-{}_{:.2f}.h5'.format(NAME, i, loss))
 
     
-    ## salva su file la grind_ris usando pickle 
+    ## salva su file la grind_ris usando pickle
     pickle.dump(grind_ris, open('../output/params_{}.bin'.format(NAME), 'wb'))
