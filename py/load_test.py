@@ -6,7 +6,7 @@ import pandas as pd
 from keras.models import load_model
 from tqdm import tqdm
 
-NAME = 'main-0_3.35'
+NAME = 'main-3_3.30'
 IM_SIZE = 90
 
 print('Load and test model "{}"'.format(NAME))
