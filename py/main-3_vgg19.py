@@ -144,8 +144,8 @@ loss, acc = min(history.history['val_loss']), max(history.history['val_acc'])
 
 h = {k: history.history[k] for k in history.history.keys()}
 
-grind_ris.append({'id': i, 'loss_val': loss, 'acc_val': acc, 'par': param, 'hist': h})
+grind_ris.append({'loss_val': loss, 'acc_val': acc, 'par': param, 'hist': h})
 
-model.save('../output/bestmodel_{}-{}_{:.2f}.h5'.format(NAME, i, loss))
+model.save('../output/bestmodel_{}_{:.2f}.h5'.format(NAME, loss))
 
 pickle.dump(grind_ris, open('../output/params_{}.bin'.format(NAME), 'wb'))

@@ -5,11 +5,11 @@ VGG19 with the combination of the parameters:
 - 'lr': [0.0001]
 - 'bsz': [64]
 - 'deep': [1, 2, 4]
-- 'act_fun': ['relu']
+- 'act_fun': ['relu', 'sigmoid']
 
 No augmentation
 """
-NAME = __file__.split('.')[0]
+NAME = __file__.split('.')[0] + '-1'
 
 import pickle
 import random
@@ -26,10 +26,6 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.models import Model
 from sklearn.model_selection import ParameterGrid, train_test_split
 from tqdm import tqdm
-
-# import my library
-# sys.path.append('../notebook/my_lib/')
-# from data_augmentation import DataAugmentation
 
 # import data
 csv_train = pd.read_csv('../input/labels.csv')
@@ -51,19 +47,6 @@ for i, (f, breed) in enumerate(tqdm(csv_train.values)):
     img = cv2.imread('../input/train/{}.jpg'.format(f))
     x_train.append(cv2.resize(img, (im_size, im_size)))
     y_train.append(labels[i])
-
-# Data argumentation
-# data_aug = DataAugmentation(x_train, options={'horizontal_flips': True,
-#                                               'rotation': True,
-#                                               'rotation_config': [(20,1.3)]})
-# for i, images in enumerate(tqdm(data_aug)):
-#     for image in images:
-#         # if i == 4:
-#         #     plt.imshow(image, cmap = 'gray', interpolation = 'bicubic')
-#         #     plt.show()
-#         x_train.append(image)
-#         y_train.append(y_train[i])
-
 
 # build np array and normalise them
 x_train_raw = np.array(x_train, np.float32) / 255.
@@ -121,7 +104,7 @@ param_grid = {'hdd_size': [512, 1024],
               'lr': [0.0001],
               'bsz': [64],
               'deep': [1, 2, 4],
-              'act_fun': ['relu']}
+              'act_fun': ['relu', 'sigmoid']}
 
 grid = list(ParameterGrid(param_grid))
 pprint(grid)
