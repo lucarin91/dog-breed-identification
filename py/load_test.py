@@ -6,8 +6,8 @@ import pandas as pd
 from keras.models import load_model
 from tqdm import tqdm
 
-NAME = 'main-no-augm-1-11_3.55'
-IM_SIZE = 90
+NAME = 'model_best-augm-vgg16-2_10-3.16'
+IM_SIZE = 100
 
 print('Load and test model "{}"'.format(NAME))
 
@@ -20,7 +20,7 @@ for f in tqdm(csv_test['id'].values):
 x_test_raw  = np.array(x_test, np.float32) / 255.
 
 # load the model
-model_name = 'bestmodel_{}.h5'.format(NAME)
+model_name = '{}.h5'.format(NAME)
 print('Try to load model file "{}"'.format(model_name))
 model = load_model('../output/{}'.format(model_name))
 model.summary()
