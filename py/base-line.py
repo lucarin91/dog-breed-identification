@@ -50,7 +50,6 @@ x_train_raw = np.array(x_train, np.float32) / 255.
 y_train_raw = np.array(y_train, np.uint8)
 print("x_train shape:", x_train_raw.shape)
 print("y_train shape:", y_train_raw.shape)
-input()
 
 # usesfull variable
 num_classes = y_train_raw.shape[1]
