@@ -1,5 +1,5 @@
 """
-VGG19 with the combination of the parameters:
+VGG16 with the combination of the parameters:
 - 'hdd_size': [512, 1024]
 - 'dr': [0.1, 0.3]
 - 'lr': [0.0001]
@@ -7,9 +7,15 @@ VGG19 with the combination of the parameters:
 - 'deep': [2, 4]
 - 'act_fun': ['relu', 'sigmoid']
 
+10% validation
+
+optimizer RMSprop
+
+image size 100
+
 No augmentation
 """
-NAME = __file__.split('.')[0] + '-1'
+NAME = __file__.split('.')[0] + '-2'
 
 import pickle
 import random
@@ -21,7 +27,7 @@ import keras
 import numpy as np
 import pandas as pd
 from keras import optimizers
-from keras.applications.vgg19 import VGG19
+from keras.applications.vgg16 import VGG16
 from keras.layers import Dense, Dropout, Flatten
 from keras.models import Model
 from sklearn.model_selection import ParameterGrid, train_test_split
@@ -38,7 +44,7 @@ targets_series = pd.Series(csv_train['breed'])
 one_hot = pd.get_dummies(targets_series, sparse = True)
 labels = np.asarray(one_hot)
 
-im_size = 90
+im_size = 100
 
 x_train = []
 y_train = []
@@ -61,12 +67,12 @@ num_classes = y_train_raw.shape[1]
 # Using the stratify parameter on treain_test_split the split should be equally distributed per classes.
 # Try a small percentage of dataset for validation (5%)
 X_train, X_valid, Y_train, Y_valid = train_test_split(x_train_raw, y_train_raw,
-                                                      test_size=0.05, random_state=42,
+                                                      test_size=0.10, random_state=42,
                                                       stratify=y_train_raw)
 
 
 def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu', deep=5):
-    base_model = VGG19(weights="imagenet", include_top=False, input_shape=(im_size, im_size, 3))
+    base_model = VGG16(weights="imagenet", include_top=False, input_shape=(im_size, im_size, 3))
 
     # Add a new top layers
     x = base_model.output
@@ -84,7 +90,7 @@ def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu',
     for layer in base_model.layers:
         layer.trainable = False
         
-    optimizer = optimizers.Adam(lr=learning_rate)
+    optimizer = optimizers.RMSprop(lr=learning_rate)
 
     model.compile(loss='categorical_crossentropy', 
                 optimizer=optimizer,
@@ -94,7 +100,7 @@ def model_builder(hdd_size=128, dr= 0.1, learning_rate= 0.003, act_fun = 'relu',
         # keras.callbacks.ModelCheckpoint('../output/model_' + NAME + '_{epoch:02d}-{val_loss:.2f}.h5',
         #                                 monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=False,
         #                                 mode='auto', period=1),
-        keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, verbose=1)]
+        keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, verbose=1)]
     model.summary()
     return model, callbacks_list
 
