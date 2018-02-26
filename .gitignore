@@ -8,6 +8,7 @@ output/*.hdf5
 output/*.h5
 output/*.bin
 output/*.zip
+output/*.png
 
 # vscode
 .vscode/
